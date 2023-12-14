@@ -73,10 +73,7 @@ aws ssm list-command-invocations --command-id <command-id> --details
 
 Command output
 
-## Author
+## Development
 
-GY Noh <nohmad@gmail.com>
+see https://docs.github.com/en/enterprise-cloud@latest/actions/creating-actions/creating-a-javascript-action
 
-# LICENSE
-
-MIT License

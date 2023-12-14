@@ -1,13 +1,9 @@
-import { SSMClient, SendCommandCommand, ListCommandInvocationsCommand } from '@aws-sdk/client-ssm';
-import * as core from '@actions/core';
+const { SSMClient, SendCommandCommand, ListCommandInvocationsCommand } = require('@aws-sdk/client-ssm');
+const core = require('@actions/core');
 
 async function main() {
-  const credentials = {
-    accessKeyId: core.getInput('aws-access-key-id'),
-    secretAccessKey: core.getInput('aws-secret-access-key'),
-  };
   const region = core.getInput('aws-region');
-  const client = new SSMClient({region, credentials});
+  const client = new SSMClient({ region: region});
   const TimeoutSeconds = parseInt(core.getInput('timeout'));
   const parameters = core.getInput('parameters', {required: true});
   const command = new SendCommandCommand({
@@ -31,15 +27,15 @@ async function main() {
     Atomics.wait(int32, 0, 0, 1000);
     const result = await client.send(new ListCommandInvocationsCommand({CommandId, Details: true}));
     const invocation = result.CommandInvocations?.[0] || {};
-    status = invocation.Status as string;
+    status = invocation.Status;
     if (['Success', 'Failure'].includes(status)) {
       for (const cp of invocation.CommandPlugins || []) {
-        outputs.push(cp.Output as string);
+        outputs.push(cp.Output);
       }
       break;
     }
   }
-  if (status != 'Success') {
+  if (status !== 'Success') {
     throw new Error(`Failed to send command: ${status}`);
   }
   core.setOutput('status', status);
@@ -47,4 +43,3 @@ async function main() {
 }
 main().catch(e => core.setFailed(e.message));
 
-export default main;
